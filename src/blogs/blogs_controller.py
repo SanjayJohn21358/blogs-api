@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, abort, request
 import json
-from blogs_service import BlogsService
+from blogs_service import BlogsService, NotFoundError, ConflictError
 import pathlib
 
 app = Flask(__name__)
@@ -20,15 +20,15 @@ def get_blogs():
             return jsonify(service.get_blogs())
         elif request.method == "POST":
             return service.create_blog(**request.json)
-    except ValueError:
-        return abort(404)
+    except ConflictError:
+        return abort(409, description="Resource already exists!")
 
 @app.route("/blogs/<name>")
 def get_blog(name):
     try:
         return jsonify(service.get_blog(name))
-    except ValueError:
-        return abort(404)
+    except NotFoundError:
+        return abort(404, description=f"Resource not found.")
 
 if __name__ == "__main__":
     app.run(port=5123)

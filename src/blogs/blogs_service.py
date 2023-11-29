@@ -3,6 +3,14 @@ import pathlib
 from typing import List, Dict, Any
 from datetime import datetime
 
+class NotFoundError(Exception):
+    """Raises error if item was not found"""
+    pass
+
+class ConflictError(Exception):
+    """Raises error if item conflicts with current state"""
+    pass
+
 class BlogsService:
     """Service that interacts with blogs data; allowing basic CRUD operations
 
@@ -48,11 +56,11 @@ class BlogsService:
                 Dict corresponding to blog with name
 
             Raises:
-                ValueError if blog is not found
+                NotFoundError if blog is not found
         """
         blog = self.blogs[self.blogs['name'] == name]
         if blog.empty:
-            raise ValueError(f"Blog with name: {name} not found.")
+            raise NotFoundError(f"Blog with name: {name} not found.")
         
         return self.__convert_to_dict(blog)[0]
     
@@ -67,18 +75,19 @@ class BlogsService:
                     author_name (str): name of author
             
             Raises:
-                ValueError if blog with name already exists
+                ConflictError if blog with name already exists
         """
         try:
             blog = self.get_blog(kwargs["name"])
-        except: ValueError
+        except: NotFoundError
         else:
-            raise ValueError(f"Blog with name: {kwargs['name']} already exists.")
+            raise ConflictError(f"Blog with name: {kwargs['name']} already exists.")
         
         current_date = datetime.today().strftime("%Y-%m-%d")
         rating = 0
         self.blogs.loc[self.blogs.last_valid_index() + 1] = [kwargs["name"], kwargs["display_name"], kwargs["author_name"], kwargs["body"], current_date, rating]
         self.save_blogs_data()
+        
         return {
             "name": kwargs["name"],
             "display_name": kwargs["display_name"],
