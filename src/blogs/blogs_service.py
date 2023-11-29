@@ -5,6 +5,12 @@ from datetime import datetime
 
 class BlogsService:
     """Service that interacts with blogs data; allowing basic CRUD operations
+
+        Args:
+            path (pathlib.Path): Path to a seeded dataframe containing blogs
+            is_test (bool): Boolean flag indicating if service is running in test mode
+
+        Test mode: data operations are not saved to pandas dataframe
     """
 
     def __init__(self, path: pathlib.Path, is_test: bool=False):

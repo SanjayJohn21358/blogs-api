@@ -15,10 +15,13 @@ def health_check():
 
 @app.route("/blogs", methods=["GET", "POST"])
 def get_blogs():
-    if request.method == "GET":
-        return jsonify(service.get_blogs())
-    elif request.method == "POST":
-        return service.create_blog(**request.json)
+    try:
+        if request.method == "GET":
+            return jsonify(service.get_blogs())
+        elif request.method == "POST":
+            return service.create_blog(**request.json)
+    except ValueError:
+        return abort(404)
 
 @app.route("/blogs/<name>")
 def get_blog(name):
@@ -28,4 +31,4 @@ def get_blog(name):
         return abort(404)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5123)
