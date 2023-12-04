@@ -13,3 +13,8 @@ Controller specifies REST functions:
 `GET /blogs/<id>`: Get blog by id
 `DELETE /blogs/<id>`: Delete blog by id
 `PUT /blogs/<id>`: Update blog by id
+
+## Run the app
+
+You can run the app via 
+`python __main__.py`
