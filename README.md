@@ -9,12 +9,15 @@ REST API using Flask and Pandas Dataframe to allow users to create, read, and or
 Controller specifies REST functions:
 
 `GET /blogs`: Get blogs
+
 `POST /blogs`: Create blog
+
 `GET /blogs/<id>`: Get blog by id
+
 `DELETE /blogs/<id>`: Delete blog by id
+
 `PUT /blogs/<id>`: Update blog by id
 
 ## Run the app
 
-You can run the app via 
-`python __main__.py`
+You can run the app via `python __main__.py` after installing requirements, i.e. `pip install requirements.txt`
