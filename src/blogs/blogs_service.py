@@ -2,55 +2,36 @@ import pandas as pd
 import pathlib
 from typing import List, Dict, Any
 from datetime import datetime
-
-class NotFoundError(Exception):
-    """Raises error if item was not found"""
-    pass
-
-class ConflictError(Exception):
-    """Raises error if item conflicts with current state"""
-    pass
+from blogs.db import DataFrameRepository, NotFoundError
 
 class BlogsService:
     """Service that interacts with blogs data; allowing basic CRUD operations
 
         Args:
-            path (pathlib.Path): Path to a seeded dataframe containing blogs
             is_test (bool): Boolean flag indicating if service is running in test mode
 
         Test mode: data operations are not saved to pandas dataframe
     """
 
-    def __init__(self, path: pathlib.Path, is_test: bool=False):
-        self.path = path
-        self.is_test = is_test
-        self.blogs = pd.read_csv(path, index_col=None)
-
-    @staticmethod
-    def __convert_to_dict(df) -> List[Dict]:
-        """Convert pandas dataframe into Dictionary
-
-            Args:
-                df (pd.DataFrame): dataframe to convert
-
-            Returns:
-                Dictionary representation of df
-        """
-        return df.to_dict(orient='records')
-
+    def __init__(self, is_test: bool=False):
+        # data path string can live in a settings file or config.yml
+        data_path = pathlib.Path("src/data")
+        blogs_data_path = data_path / "blogs.csv"
+        self.blogs = DataFrameRepository(path=blogs_data_path, is_test=is_test)
+        
     def get_blogs(self) -> List[Dict]:
         """Get blogs
 
             Returns:
                 List of Dicts where each dict is a blog
         """
-        return self.__convert_to_dict(self.blogs)
+        return self.blogs.get_all()
     
     def get_blog(self, name: str) -> Dict:
         """Get blog by url name
 
             Args:
-                name (str): url safe name of blog
+                id (str): url safe id of blog
 
             Returns:
                 Dict corresponding to blog with name
@@ -58,18 +39,16 @@ class BlogsService:
             Raises:
                 NotFoundError if blog is not found
         """
-        blog = self.blogs[self.blogs['name'] == name]
-        if blog.empty:
-            raise NotFoundError(f"Blog with name: {name} not found.")
-        
-        return self.__convert_to_dict(blog)[0]
+        try:
+            return self.blogs.get(name)
+        except KeyError:
+            raise NotFoundError
     
-    def create_blog(self, **kwargs: Dict[str, Any]) -> Dict:
+    def create_blog(self, params: Dict[str, Any]) -> Dict:
         """Create blog
 
             Args:
-                **kwargs:
-                    name (str): url-safe name of blog
+                params:
                     display_name (str): display name of blog
                     body (str): content of blog
                     author_name (str): name of author
@@ -77,26 +56,53 @@ class BlogsService:
             Raises:
                 ConflictError if blog with name already exists
         """
-        try:
-            blog = self.get_blog(kwargs["name"])
-        except: NotFoundError
-        else:
-            raise ConflictError(f"Blog with name: {kwargs['name']} already exists.")
-        
-        current_date = datetime.today().strftime("%Y-%m-%d")
-        rating = 0
-        self.blogs.loc[self.blogs.last_valid_index() + 1] = [kwargs["name"], kwargs["display_name"], kwargs["author_name"], kwargs["body"], current_date, rating]
-        self.save_blogs_data()
-        
-        return {
-            "name": kwargs["name"],
-            "display_name": kwargs["display_name"],
-            "author_name": kwargs["author_name"],
-            "body": kwargs["body"],
-            "created_on": current_date,
-            "rating": rating
-        }
 
-    def save_blogs_data(self):
-        if not self.is_test:
-            self.blogs.to_csv(self.path, index=None)
+        params["id"] = self.__generate_id(params["display_name"])
+        params["created_on"] = datetime.today().strftime("%Y-%m-%d")
+        params["rating"] = 0
+
+        item = self.blogs.add(params)
+        self.blogs.save()
+
+        return item
+
+    def update_blog(self, id: str, params: Dict[str, Any]) -> Dict:
+        """Update blog
+
+            Args:
+                id (str): id of blog
+                params:
+                    display_name (str): display name of blog
+                    body (str): content of blog
+                    author_name (str): name of author
+            
+            Raises:
+                NotFoundError if blog is not found with id
+        """
+        try:
+            blog = self.blogs.update(id, params)
+            self.blogs.save()
+            return blog
+        except KeyError:
+            raise NotFoundError
+    
+    def delete_blog(self, id: str) -> None:
+        """Delete blog
+        
+            Args:
+                id (str): id of blog to delete
+
+            Raises:
+                NotFoundError if blog is not found
+        """
+        try:
+            self.blogs.remove(id)
+            self.blogs.save()
+        except KeyError:
+            raise NotFoundError
+
+    @staticmethod
+    def __generate_id(keyword: str) -> str:
+        """Generate id given keyword"""
+        id = "-".join(keyword.split(' ')).lower()
+        return id

@@ -1,34 +1,38 @@
-from flask import Flask, jsonify, abort, request
-import json
-from blogs_service import BlogsService, NotFoundError, ConflictError
-import pathlib
+from flask import Flask, jsonify, abort, request, Response
+from blogs.blogs_service import BlogsService
+from blogs.db import NotFoundError, ConflictError
 
 app = Flask(__name__)
-# data path string can live in a settings file or config.yml
-data_path = pathlib.Path("src/data")
-blogs_data_path = data_path / "blogs.csv"
-service = BlogsService(blogs_data_path)
+service = BlogsService()
 
-@app.route("/health")
+@app.route("/health/status")
 def health_check():
     return "System is OK!"
 
 @app.route("/blogs", methods=["GET", "POST"])
 def get_blogs():
+    """Get or create blogs"""
     try:
         if request.method == "GET":
             return jsonify(service.get_blogs())
         elif request.method == "POST":
-            return service.create_blog(**request.json)
+            return service.create_blog(request.json)
     except ConflictError:
         return abort(409, description="Resource already exists!")
 
-@app.route("/blogs/<name>")
-def get_blog(name):
+@app.route("/blogs/<id>", methods=["GET", "DELETE", "PUT"])
+def get_blog(id):
+    """Get, update or delete singular blog by id"""
     try:
-        return jsonify(service.get_blog(name))
+        if request.method == "GET":
+            return jsonify(service.get_blog(id))
+        elif request.method == "DELETE":
+            service.delete_blog(id)
+            return Response(status=204)
+        elif request.method == "PUT":
+            return jsonify(service.update_blog(id, request.json))
     except NotFoundError:
         return abort(404, description=f"Resource not found.")
-
-if __name__ == "__main__":
+    
+def main():
     app.run(port=5123)
