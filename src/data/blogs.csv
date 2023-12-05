@@ -1,6 +1,6 @@
-display_name,author_name,body,created_on,rating
-How To Cook Eggs in 10 Seconds,Jiminy Cricket,Cooking eggs is easy. All you have to do is throw them in the pan!,2021-01-01,5
-Which Way Is Up?,Donald Trump,"I keep asking people which way is up, and no one takes me seriously. Why is this so difficult?",2023-11-01,3
-"Sometimes, Coding Can Be Frustrating: How to Avoid Burnout",Elon Musk,"Even though I've never actually coded anything, I know everything it takes to be a successful coder.",2022-04-02,4
-Pilates: The Quickest Way to Show How Old You Are,Joseph Pilates,"If you've ever wanted to break the news to your friends and family that you're getting old, Pilates might be the first thing to try.",2023-11-29,0
-Taking Your Time: The Procrastinator's Story,Sanjay John,You don't know me,2023-12-04,4
+id,display_name,author_name,body,created_on,rating
+how-to-cook-eggs-in-10-seconds,How To Cook Eggs in 10 Seconds,Jiminy Cricket,Cooking eggs is easy. All you have to do is throw them in the pan!,2021-01-01,5
+which-way-is-up,Which Way Is Up?,Donald Trump,"I keep asking people which way is up, and no one takes me seriously. Why is this so difficult?",2023-11-01,3
+sometimes-coding-can-be-frustrating:-how-to-avoid-burnout,"Sometimes, Coding Can Be Frustrating: How to Avoid Burnout",Elon Musk,"Even though I've never actually coded anything, I know everything it takes to be a successful coder.",2022-04-02,4
+pilates:-the-quickest-way-to-show-how-old-you-are,Pilates: The Quickest Way to Show How Old You Are,Joseph Pilates,"If you've ever wanted to break the news to your friends and family that you're getting old, Pilates might be the first thing to try.",2023-11-29,0
+taking-your-time:-the-procrastinator's-story,Taking Your Time: The Procrastinator's Story,Sanjay John,"How can we talk about progress without talking about procrastinators? While they may seem to be lazy, procrastinators are in fact some of the smartest people in the world.",2023-12-04,3

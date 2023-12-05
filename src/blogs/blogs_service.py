@@ -2,22 +2,17 @@ import pandas as pd
 import pathlib
 from typing import List, Dict, Any
 from datetime import datetime
-from blogs.db import DataFrameRepository, NotFoundError
+from blogs.db import IRepository, NotFoundError
 
 class BlogsService:
     """Service that interacts with blogs data; allowing basic CRUD operations
 
         Args:
             is_test (bool): Boolean flag indicating if service is running in test mode
-
-        Test mode: data operations are not saved to pandas dataframe
     """
 
-    def __init__(self, is_test: bool=False):
-        # data path string can live in a settings file or config.yml
-        data_path = pathlib.Path("src/data")
-        blogs_data_path = data_path / "blogs.csv"
-        self.blogs = DataFrameRepository(path=blogs_data_path, is_test=is_test)
+    def __init__(self, repository: IRepository):
+        self.blogs = repository
         
     def get_blogs(self) -> List[Dict]:
         """Get blogs

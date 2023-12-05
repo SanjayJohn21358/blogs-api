@@ -20,7 +20,7 @@ class IRepository(ABC):
     """
 
     @abstractmethod
-    def __init__(self, path, is_test):
+    def __init__(self, path, is_test=False):
         self.path = path
         self.is_test = is_test
 
@@ -59,7 +59,7 @@ class DataFrameRepository(IRepository):
     """Implements IRepository to use a pandas dataframe
     """
 
-    def __init__(self, path, is_test):
+    def __init__(self, path, is_test=False):
         self.path = path
         self.is_test = is_test
         self.df = pd.read_csv(path)
@@ -161,7 +161,7 @@ class DataFrameRepository(IRepository):
 
     def save(self):
         if not self.is_test:
-            self.df.to_csv(self.path, index=None)
+            self.df.to_csv(self.path)
 
     def convert_df_to_dict(self, df: DataFrame) -> List[Dict]:
         """Convert pandas dataframe into Dictionary

@@ -1,6 +1,6 @@
 import unittest
 from blogs.blogs_service import BlogsService
-from blogs.db import NotFoundError
+from blogs.db import NotFoundError, DataFrameRepository
 from typing import Dict
 import pathlib
 
@@ -42,7 +42,9 @@ class BlogsServiceTests(unittest.TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        cls.service = BlogsService(is_test=True)
+        path = pathlib.Path("src/data") / "blogs.csv"
+        repo = DataFrameRepository(path, is_test=True)
+        cls.service = BlogsService(repo)
 
     def test_get_blogs(self):
         # arrange + act

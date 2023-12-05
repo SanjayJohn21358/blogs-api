@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, abort, request, Response
 from blogs.blogs_service import BlogsService
-from blogs.db import NotFoundError, ConflictError
+from blogs.db import NotFoundError, ConflictError, DataFrameRepository
+import pathlib
 
 app = Flask(__name__)
-service = BlogsService()
+repo = DataFrameRepository(pathlib.Path("src/data") / "blogs.csv")
+service = BlogsService(repo)
 
 @app.route("/health/status")
 def health_check():
